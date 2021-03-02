@@ -4,6 +4,7 @@ const Journal = () => {
 
     const [socketOpen, setSocketOpen] = useState(false);
     const [log, setLog] = useState([]);
+    const temp = [];
     var connection = new autobahn.Connection({
         url: "ws://testassignment.filmdatabox.com:8395/ws",
         realm: "democontrol"
@@ -11,20 +12,13 @@ const Journal = () => {
     const initWebSocket = () => {
         connection.onopen = function (session) {
             var journal = function (args) {
-                console.log(args[0]);
+                setLog(args[0]);
             }
-            // 1) subscribe to a topic
-            // function onevent(args) {
-            //     console.log("Event:", args[0]);
-            // }
             session.subscribe('com.filmdatabox.democontrol.journal', journal);
-            //session.register('com.filmdatabox.democontrol.journal', journal)
+            // session.register('com.filmdatabox.democontrol.journal', journal)
             session.call('com.filmdatabox.democontrol.journal').then(
                 function (res) {
-                    //console.log(res.split('Mar').join("\n"))
-                    //setLog(res.split('Mar').join("\n")
                     setLog(res)
-
                 }
             );
 
@@ -32,13 +26,17 @@ const Journal = () => {
         connection.open();
         setSocketOpen(true);
     }
+    // useEffect(() => {
+    //     //window.location.reload(false)
+    // }, [log])
+
     useEffect(() => {
-        // if(socketOpen)
         initWebSocket();
     }, []);
 
     return (
-        <div>{log}</div>
+        log.map(i => <div>{i}</div>)
+
     );
 
 }
